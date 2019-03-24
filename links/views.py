@@ -32,6 +32,7 @@ class LinksDetailView(generics.RetrieveUpdateDestroyAPIView):
   def get(self, request, *args, **kwargs):
     try:
       link = self.queryset.get(pk=kwargs["pk"])
+      link.clicks += 1
       return Response(LinksSerializer(link).data)
     except Links.DoesNotExist:
       return Response(

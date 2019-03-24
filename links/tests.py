@@ -94,7 +94,9 @@ class GetASingleLinkTest(BaseViewTest):
     response = self.fetch_a_link(Links.objects.all()[0].pk)
     expected = Links.objects.all()[0]
     serialized = LinksSerializer(expected)
-    self.assertEqual(response.data, serialized.data)
+    self.assertEqual(response.data['link'], serialized.data['link'])
+    self.assertEqual(response.data['slug'], serialized.data['slug'])
+    self.assertEqual(response.data['clicks'], serialized.data['clicks'] + 1)
     self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     response = self.fetch_a_link(self.invalid_link_id)
@@ -122,3 +124,6 @@ class CreateALinkTest(BaseViewTest):
       "Link not created",
     )
     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+# class UpdateLinkTest(BaseViewTest):
+#   def test_update_a_link(self):
