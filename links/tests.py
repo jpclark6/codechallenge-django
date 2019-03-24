@@ -92,12 +92,15 @@ class GetAllLinksTest(BaseViewTest):
 class GetASingleLinkTest(BaseViewTest):
   def test_get_a_link(self):
     expected = Links.objects.all()[0]
-    response = self.fetch_a_link(Links.objects.all()[0].id)
+    response = self.fetch_a_link(expected.id)
     serialized = LinksSerializer(expected)
     self.assertEqual(response.data['link'], serialized.data['link'])
     self.assertEqual(response.data['slug'], serialized.data['slug'])
     self.assertEqual(response.data['clicks'], serialized.data['clicks'] + 1)
     self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    response = self.fetch_a_link(expected.id)
+    self.assertEqual(response.data['clicks'], serialized.data['clicks'] + 2)
 
     response = self.fetch_a_link(self.invalid_link_id)
     self.assertEqual(
