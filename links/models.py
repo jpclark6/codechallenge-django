@@ -1,8 +1,8 @@
 from django.db import models
 
-class Link(models.Model):
-  link = models.CharField(max_length=100)
-  slug = models.SlugField()
+class Links(models.Model):
+  link = models.CharField(max_length=40, null=False)
+  slug = models.SlugField(max_length=40, null=False)
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now=True)
 

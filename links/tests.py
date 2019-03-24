@@ -11,7 +11,7 @@ class BaseViewTest(APITestCase):
   @staticmethod
   def create_link(link='', slug=''):
     if link != '' and slug != '':
-      Link.objects.create(link=link, slug=slug)
+      Links.objects.create(link=link, slug=slug)
 
   def setUp(self):
     self.create_link('eagle', 'eagle')
