@@ -153,5 +153,9 @@ class DeleteALinkTest(BaseViewTest):
     response = self.delete_a_link(linkId)
     self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-    response.self.delete_a_link(Links.objects.all()[-1].id + 50)
+    response = self.delete_a_link(Links.objects.all()[0].id + 50)
+    self.assertEqual(
+        response.data["error"],
+        "Link not found"
+    )
     self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
