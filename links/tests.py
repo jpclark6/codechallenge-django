@@ -64,7 +64,7 @@ class BaseViewTest(APITestCase):
 
   def edit_a_link(self, **kwargs):
     return self.client.put(
-        reverse("links-detail", kwargs={"version": "v1"}),
+        reverse("links-detail", kwargs={"version": "v1", "pk": kwargs["id"]}),
         data=json.dumps(kwargs["data"]),
         content_type='application/json',
     )
@@ -130,15 +130,16 @@ class UpdateLinkTest(BaseViewTest):
     response = self.edit_a_link(
       version="v1",
       data=self.valid_data_post,
-      id=1,
+      id=Links.objects.all()[0].id,
     )
-    self.assertEqual(response.data, self.valid_data_post_response)
+    self.assertEqual(response.data['link'], self.valid_data_post_response['link'])
+    self.assertEqual(response.data['slug'], self.valid_data_post_response['slug'])
     self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     response = self.edit_a_link(
       version="v1",
       data=self.invalid_data,
-      id=2,
+      id=Links.objects.all()[1].id,
     )
     self.assertEqual(
       response.data["error"],

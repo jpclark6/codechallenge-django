@@ -41,3 +41,27 @@ class LinksDetailView(generics.RetrieveUpdateDestroyAPIView):
         },
         status=status.HTTP_404_NOT_FOUND
       )
+
+  def put(self, request, *args, **kwargs):
+    try: 
+      link = self.queryset.get(pk=kwargs["pk"])
+      serializer = LinksSerializer()
+      new_link = request.data['link']
+      if(new_link == ''):
+        raise ValueError('Empty link title')
+      updated_link = serializer.update(link, {'link': new_link, 'slug': new_link})
+      return Response(LinksSerializer(updated_link).data)
+    except Links.DoesNotExist:
+      return Response(
+        data={
+          "error": "Link not updated"
+        },
+        status=status.HTTP_400_BAD_REQUEST
+      )
+    except ValueError:
+      return Response(
+          data={
+              "error": "Link not updated"
+          },
+          status=status.HTTP_400_BAD_REQUEST
+      )
