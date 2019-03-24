@@ -125,5 +125,23 @@ class CreateALinkTest(BaseViewTest):
     )
     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-# class UpdateLinkTest(BaseViewTest):
-#   def test_update_a_link(self):
+class UpdateLinkTest(BaseViewTest):
+  def test_update_a_link(self):
+    response = self.edit_a_link(
+      version="v1",
+      data=self.valid_data_post,
+      id=1,
+    )
+    self.assertEqual(response.data, self.valid_data_post_response)
+    self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    response = self.edit_a_link(
+      version="v1",
+      data=self.invalid_data,
+      id=2,
+    )
+    self.assertEqual(
+      response.data["error"],
+      "Link not updated"
+    )
+    self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
