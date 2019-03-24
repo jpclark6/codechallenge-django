@@ -43,8 +43,8 @@ class BaseViewTest(APITestCase):
       "slug": "",
       "clicks": "",
     }
-    self.valid_song_id = 1
-    self.invalid_song_id = 99
+    self.valid_link_id = 1
+    self.invalid_link_id = 99
 
   def make_a_link(self, **kwargs):
     return self.client.post(
@@ -83,8 +83,8 @@ class GetAllLinksTest(BaseViewTest):
 
 class GetASingleLinkTest(BaseViewTest):
   def test_get_a_link(self):
-    response = self.fetch_a_link(self.valid_song_id)
-    expected = Links.objects.get(pk=self.valid_song_id)
+    response = self.fetch_a_link(self.valid_link_id)
+    expected = Links.objects.get(pk=self.valid_link_id)
     serialized = LinksSerializer(expected)
     self.assertEqual(response.data, serialized.data)
     self.assertEqual(response.status_code, status.HTTP_200_OK)
