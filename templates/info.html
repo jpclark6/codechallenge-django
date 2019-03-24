@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>CodingChallenge</title>
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+
+<body>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      max-width: 800px;
+      margin: 10px auto;
+      background-color: rgb(233, 233, 233);
+      border: solid 1px darkgrey;
+      border-radius: 10px;
+      padding: 5px 30px;
+    }
+  
+    .hidden {
+      display: none;
+    }
+  
+    .link {
+      color: darkblue;
+      transition: .3s;
+    }
+  
+    .link:hover {
+      color: darkred;
+      cursor: pointer;
+    }
+  
+    .indented {
+      margin-left: 40px;
+    }
+  </style>
+
+  <h1>Ambassador Links API V1 - Django</h1>
+  <p>Created by Justin Clark on 3-24-19</p>
+  <h2>Description</h2>
+  <p>
+    For the Ambassador code challenge this API provides basic endpoints to save links,
+    display links, count clicks to a link, and delete links.
+  </p>
+  <h2>Endpoints</h2>
+  <h3>Get all links with each link's click count</h3>
+  <p id='get-all-links' class='indented link'>GET '/api/v1/links'</p>
+  <button id='all-button' class='hidden indented'>Hide</button>
+  <pre id='all-links' class='indented'></pre>
+  
+  <h3>Get individual link with click count - also increments click count</h3>
+  <p id='get-individual-link' class='indented'>GET '/api/v1/links/:id/'</p>
+  <form class='indented'>
+    <input type='text' placeholder='Enter Link ID'>
+    <input id='get-ind' type='submit' value='Find Link'>
+  </form>
+  <button id='individual-eagle-button' class='hidden indented'>Hide</button>
+  <pre id='individual-link' class='indented'></pre>
+  
+  <h3>Create new link</h3>
+  <p id='create-link' class='indented'>POST '/api/v1/links/' Body: {'link': new_link}</p>
+  <p id='create-link-body' class='indented'>Body json: {'link': new_link}</p>
+  <form class='indented'>
+    <input type='text' placeholder='Enter Link Name'>
+    <input id='create' type='submit' value='Create Link'>
+  </form>
+  <button id='create-button' class='hidden indented'>Hide</button>
+  <pre id='new-link' class='indented'></pre>
+  
+  <h3>Edit link</h3>
+  <p id='edit-link-text' class='indented'>PUT '/api/v1/links/:id/'</p>
+  <p id='edit-link-text-body' class='indented'>Body json: {'link': new_name}</p>
+  <form class='indented'>
+    <input id='edit-old' type='text' placeholder='Enter Link ID To Edit'>
+    <input id='edit-new' type='text' placeholder='Enter New Link Name'>
+    <input id='edit' type='submit' value='Update Link'>
+  </form>
+  <button id='edit-button' class='hidden indented'>Hide</button>
+  <pre id='edit-link' class='indented'></pre>
+  
+  <h3>Delete link</h3>
+  <p id='delete-link-text' class='indented'>DELETE '/api/v1/links/:id/'</p>
+  <form class='indented'>
+    <input type='text' placeholder='Enter Link ID'>
+    <input id='delete' type='submit' value='Delete Link'>
+  </form>
+  <button id='delete-button' class='hidden indented'>Hide</button>
+  <pre id='delete-link' class='indented'></pre>
+
+
+  <script>
+    window.onload = () => {
+
+      // HTTP REQUESTS
+      const getAllLinks = () => {
+        $.getJSON(`/api/v1/links`, function (response) {
+          $('#all-links').text(JSON.stringify(response, null, 2));
+        })
+        $('#all-button').removeClass('hidden');
+      }
+
+      const getInd = (id) => {
+        $.getJSON(`/api/v1/links/${id}`, function (response) {
+          $('#individual-link').text(JSON.stringify(response, null, 2));
+        })
+        $('#individual-eagle-button').removeClass('hidden');
+      }
+
+      const createInd = (slug) => {
+        $.ajax({
+          contentType: 'application/json',
+          data: JSON.stringify({ "link": slug }),
+          dataType: 'json',
+          type: 'POST',
+          url: '/api/v1/links/',
+          success: (response) => {
+            $('#new-link').text(JSON.stringify(response, null, 2));
+            $('#create-button').removeClass('hidden');
+          }
+        })
+      }
+
+      const deleteInd = (id) => {
+        $.ajax({
+          url: `/api/v1/links/${id}/`,
+          type: "DELETE",
+          success: (response) => {
+            $('#delete-link').text(`Deleted link with ID: ${id}`);
+            $('#delete-button').removeClass('hidden');
+          }
+        })
+      }
+
+      const editInd = (id, new_slug) => {
+        $.ajax({
+          url: `/api/v1/links/${id}/`,
+          contentType: 'application/json',
+          data: JSON.stringify({ "link": new_slug }),
+          dataType: 'json',
+          type: "PUT",
+          success: (response) => {
+            $('#edit-link').text(JSON.stringify(response, null, 2));
+            $('#edit-button').removeClass('hidden');
+          }
+        })
+      }
+
+
+      // EVENT LISTENERS
+
+      const addListenerToGetAll = () => {
+        $('#get-all-links').click((e) => {
+          getAllLinks();
+        })
+        $('#all-button').click((e) => {
+          e.preventDefault();
+          $('#all-button').addClass('hidden');
+          $('#all-links').text('');
+        })
+      }
+      const addListenerToGetEagle = () => {
+        $('#individual-eagle-button').click((e) => {
+          e.preventDefault();
+          $('#individual-eagle-button').addClass('hidden');
+          $('#individual-link').text('');
+        })
+      }
+      const addListenerToGetInd = () => {
+        $('#get-ind').click((e) => {
+          e.preventDefault();
+          getInd(e.target.parentElement.firstElementChild.value);
+        })
+        $('#individual-eagle-button').click((e) => {
+          e.preventDefault();
+          $('#individual-eagle-button').addClass('hidden');
+          $('#individual-link').text('');
+        })
+      }
+      const addListenerToCreate = () => {
+        $('#create').click((e) => {
+          e.preventDefault();
+          createInd(e.target.parentElement.firstElementChild.value);
+        })
+        $('#create-button').click((e) => {
+          e.preventDefault();
+          $('#create-button').addClass('hidden');
+          $('#new-link').text('');
+        })
+      }
+      const addListenerToDelete = () => {
+        $('#delete').click((e) => {
+          e.preventDefault();
+          deleteInd(e.target.parentElement.firstElementChild.value);
+        })
+        $('#delete-button').click((e) => {
+          e.preventDefault();
+          $('#delete-button').addClass('hidden');
+          $('#delete-link').text('');
+        })
+      }
+      const addListenerToEdit = () => {
+        $('#edit').click((e) => {
+          e.preventDefault();
+          editInd($('#edit-old').val(), $('#edit-new').val());
+        })
+        $('#edit-button').click((e) => {
+          e.preventDefault();
+          $('#edit-button').addClass('hidden');
+          $('#edit-link').text('');
+        })
+      }
+
+      // ADD EVENT LISTENERS TO DOM
+
+      addListenerToGetAll();
+      addListenerToGetInd();
+      addListenerToGetEagle();
+      addListenerToCreate();
+      addListenerToDelete();
+      addListenerToEdit();
+    }
+  </script>
+
+</body>
+
+</html>
+
+
+
+
+

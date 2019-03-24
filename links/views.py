@@ -1,4 +1,6 @@
+from django.http import HttpResponse
 from django.shortcuts import render
+from django.views.generic import TemplateView
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.views import status
@@ -7,6 +9,9 @@ from .decorators import validate_request_data
 from .models import Links
 from .serializers import LinksSerializer
 
+class LinksInfo(TemplateView):
+  template_name = "info.html"
+  
 
 class ListLinksView(generics.ListAPIView):
   queryset = Links.objects.all()
