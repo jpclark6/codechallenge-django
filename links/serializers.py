@@ -5,4 +5,4 @@ from .models import Links
 class LinksSerializer(serializers.ModelSerializer):
   class Meta:
     model = Links
-    fields = ("link", "slug")
+    fields = ("link", "slug", "clicks")
