@@ -33,6 +33,18 @@ class BaseViewTest(APITestCase):
     self.create_link('worm', 'worm', 2)
     self.create_link('mongoose', 'mongoose', 3)
     self.create_link('pine', 'pine', 6)
+    self.valid_data = {
+      "link": "bird",
+      "slug": "bird",
+      "clicks": 4,
+    }
+    self.invalid_data = {
+      "link": "",
+      "slug": "",
+      "clicks": "",
+    }
+    self.valid_song_id = 1
+    self.invalid_song_id = 99
 
   def make_a_link(self, **kwargs):
     return self.client.post(
@@ -69,3 +81,17 @@ class GetAllLinksTest(BaseViewTest):
     self.assertEqual(response.data, serialized.data)
     self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+class GetASingleLinkTest(BaseViewTest):
+  def test_get_a_link(self):
+    response = self.fetch_a_link(self.valid_song_id)
+    expected = Links.objects.get(pk=self.valid_song_id)
+    serialized = LinksSerializer(expected)
+    self.assertEqual(response.data, serialized.data)
+    self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    response = self.fetch_a_link(self.invalid_link_id)
+    self.assertEqual(
+      response.data["error"],
+      "Link not found"
+    )
+    self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
