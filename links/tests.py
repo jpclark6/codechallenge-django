@@ -5,6 +5,21 @@ from rest_framework.views import status
 from .models import Links
 from .serializers import LinksSerializer
 
+
+class LinksModelTest(APITestCase):
+  def setUp(self):
+    self.a_link = Links.objects.create(
+        link="eagle",
+        slug="eagle",
+        clicks=3,
+    )
+
+  def test_link(self):
+    self.assertEqual(self.a_link.link, "eagle")
+    self.assertEqual(self.a_link.slug, "eagle")
+    self.assertEqual(self.a_link.clicks, 3)
+
+
 class BaseViewTest(APITestCase):
   client = APIClient()
 
@@ -19,19 +34,29 @@ class BaseViewTest(APITestCase):
     self.create_link('mongoose', 'mongoose', 3)
     self.create_link('pine', 'pine', 6)
 
-
-class LinksModelTest(APITestCase):
-  def setUp(self):
-    self.a_link = Links.objects.create(
-      link="eagle",
-      slug="eagle",
-      clicks=3,
+  def make_a_link(self, **kwargs):
+    return self.client.post(
+        reverse("links-all", kwargs={"version": "v1"}),
+        data=json.dumps(kwargs["data"]),
+        content_type='application/json',
     )
 
-  def test_link(self):
-    self.assertEqual(self.a_link.link, "eagle")
-    self.assertEqual(self.a_link.slug, "eagle")
-    self.assertEqual(self.a_link.clicks, 3)
+  def edit_a_link(self, **kwargs):
+    return self.client.post(
+        reverse("links-detail", kwargs={"version": "v1"}),
+        data=json.dumps(kwargs["data"]),
+        content_type='application/json',
+    )
+
+  def fetch_a_link(self, pk=0):
+    return self.client.get(
+        reverse("links-detail", kwargs={"version": "v1", "pk": pk})
+    )
+
+  def delete_a_link(self, pk=0):
+    return self.client.delete(
+        reverse("links-detail", kwargs={"version": "v1", "pk": pk})
+    )
 
 class GetAllLinksTest(BaseViewTest):
 
@@ -43,3 +68,4 @@ class GetAllLinksTest(BaseViewTest):
     serialized = LinksSerializer(expected, many=True)
     self.assertEqual(response.data, serialized.data)
     self.assertEqual(response.status_code, status.HTTP_200_OK)
+
