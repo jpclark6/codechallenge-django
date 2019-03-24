@@ -146,3 +146,12 @@ class UpdateLinkTest(BaseViewTest):
       "Link not updated"
     )
     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+class DeleteALinkTest(BaseViewTest):
+  def test_delete_a_link(self):
+    linkId = Links.objects.all()[0].id
+    response = self.delete_a_link(linkId)
+    self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    response.self.delete_a_link(Links.objects.all()[-1].id + 50)
+    self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
