@@ -91,8 +91,8 @@ class GetAllLinksTest(BaseViewTest):
 
 class GetASingleLinkTest(BaseViewTest):
   def test_get_a_link(self):
-    response = self.fetch_a_link(Links.objects.all()[0].pk)
     expected = Links.objects.all()[0]
+    response = self.fetch_a_link(Links.objects.all()[0].id)
     serialized = LinksSerializer(expected)
     self.assertEqual(response.data['link'], serialized.data['link'])
     self.assertEqual(response.data['slug'], serialized.data['slug'])
@@ -112,7 +112,9 @@ class CreateALinkTest(BaseViewTest):
       version="v1",
       data=self.valid_data_post,
     )
-    self.assertEqual(response.data, self.valid_data_post_response)
+    self.assertEqual(response.data['link'], self.valid_data_post_response['link'])
+    self.assertEqual(response.data['slug'], self.valid_data_post_response['slug'])
+    self.assertEqual(response.data['clicks'], self.valid_data_post_response['clicks'])
     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     response = self.make_a_link(
