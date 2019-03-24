@@ -1,3 +1,4 @@
+import json
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APITestCase, APIClient
@@ -38,6 +39,14 @@ class BaseViewTest(APITestCase):
       "slug": "bird",
       "clicks": 4,
     }
+    self.valid_data_post = {
+      "link": "bird",
+    }
+    self.valid_data_post_response = {
+      "link": "bird",
+      "slug": "bird",
+      "clicks": 0,
+    }
     self.invalid_data = {
       "link": "",
       "slug": "",
@@ -54,7 +63,7 @@ class BaseViewTest(APITestCase):
     )
 
   def edit_a_link(self, **kwargs):
-    return self.client.post(
+    return self.client.put(
         reverse("links-detail", kwargs={"version": "v1"}),
         data=json.dumps(kwargs["data"]),
         content_type='application/json',
@@ -71,7 +80,6 @@ class BaseViewTest(APITestCase):
     )
 
 class GetAllLinksTest(BaseViewTest):
-
   def test_get_all_links(self):
     response = self.client.get(
       reverse("links-all", kwargs={"version": "v1"})
@@ -83,8 +91,8 @@ class GetAllLinksTest(BaseViewTest):
 
 class GetASingleLinkTest(BaseViewTest):
   def test_get_a_link(self):
-    response = self.fetch_a_link(self.valid_link_id)
-    expected = Links.objects.get(pk=self.valid_link_id)
+    response = self.fetch_a_link(Links.objects.all()[0].pk)
+    expected = Links.objects.all()[0]
     serialized = LinksSerializer(expected)
     self.assertEqual(response.data, serialized.data)
     self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -95,3 +103,22 @@ class GetASingleLinkTest(BaseViewTest):
       "Link not found"
     )
     self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+class CreateALinkTest(BaseViewTest):
+  def test_create_a_link(self):
+    response = self.make_a_link(
+      version="v1",
+      data=self.valid_data_post,
+    )
+    self.assertEqual(response.data, self.valid_data_post_response)
+    self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    response = self.make_a_link(
+      version="v1",
+      data=self.invalid_data,
+    )
+    self.assertEqual(
+      response.data["error"],
+      "Link not created",
+    )
+    self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

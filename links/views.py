@@ -3,6 +3,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.views import status
 
+from .decorators import validate_request_data
 from .models import Links
 from .serializers import LinksSerializer
 
@@ -10,6 +11,18 @@ from .serializers import LinksSerializer
 class ListLinksView(generics.ListAPIView):
   queryset = Links.objects.all()
   serializer_class = LinksSerializer
+
+  @validate_request_data
+  def post(self, request, *args, **kwargs):
+    new_link = Links.objects.create(
+      link=request.data["link"],
+      slug=request.data["link"],
+      clicks = 0,
+    )
+    return Response(
+      data=LinksSerializer(new_link).data,
+      status=status.HTTP_201_CREATED
+    )
 
 
 class LinksDetailView(generics.RetrieveUpdateDestroyAPIView):
